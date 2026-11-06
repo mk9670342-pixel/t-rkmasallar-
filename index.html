@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dilden Dile Türk Masalları</title>
+    <style>
+        /* Rapor Tasarım Kararları ile %100 Uyumlu Palette */
+        :root {
+            --bg-krem: #F9F6F0;       /* Yumuşak Krem / Keten Tonu */
+            --main-lacivert: #14325C;  /* Derin Lacivert / Gece Mavisi */
+            --accent-kahve: #5C4033;   /* Toprak Kahvesi / Ahşap Tonu */
+            --card-white: #FFFFFF;
+            --text-dark: #2D3748;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-krem);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        /* Header / Başlık */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            color: var(--main-lacivert);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            color: var(--accent-kahve);
+            font-size: 1.15rem;
+            font-style: italic;
+        }
+
+        /* Ana Konteynır */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* 4 Üstte, 4 Altta Grid Yapısı */
+        .masal-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        /* Estetik Kutucuk Tasarımları */
+        .masal-kart {
+            background-color: var(--card-white);
+            border: 1px solid rgba(92, 64, 51, 0.18);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 150px;
+            box-shadow: 0 4px 12px rgba(20, 50, 92, 0.04);
+            user-select: none;
+        }
+
+        .masal-kart:hover {
+            transform: translateY(-6px);
+            border-color: var(--main-lacivert);
+            box-shadow: 0 12px 24px rgba(20, 50, 92, 0.12);
+            background-color: #FFFFFF;
+        }
+
+        .masal-baslik {
+            color: var(--main-lacivert);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .oku-link {
+            color: var(--accent-kahve);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .masal-kart:hover .oku-link {
+            color: var(--main-lacivert);
+        }
+
+        /* Açılır Masal Penceresi (Modal) */
+        .modal-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(20, 50, 92, 0.45);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Modal Açık Durumu */
+        .modal-bg.aktif {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-icerik {
+            background-color: var(--bg-krem);
+            border: 2px solid var(--accent-kahve);
+            border-radius: 20px;
+            max-width: 650px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-bg.aktif .modal-icerik {
+            transform: scale(1);
+        }
+
+        .kapat-btn {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            font-size: 2.2rem;
+            background: none;
+            border: none;
+            color: var(--accent-kahve);
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .kapat-btn:hover {
+            color: var(--main-lacivert);
+        }
+
+        .modal-baslik {
+            color: var(--main-lacivert);
+            font-size: 1.9rem;
+            margin-bottom: 12px;
+            padding-right: 30px;
+        }
+
+        .modal-cizgi {
+            border: 0;
+            height: 1px;
+            background: var(--accent-kahve);
+            opacity: 0.25;
+            margin-bottom: 24px;
+        }
+
+        .modal-metin {
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: var(--text-dark);
+            white-space: pre-line;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--accent-kahve);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Mobil ve Tablet Uyumluluğu (Duyarlı Tasarım) */
+        @media (max-width: 960px) {
+            .masal-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 520px) {
+            .masal-grid {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Dilden Dile Türk Masalları</h1>
+        <p>Anadolu ve Türk Coğrafyasından Seçme 8 Geleneksel Anlatı</p>
+    </header>
+
+    <main class="container">
+        <div class="masal-grid">
+
+            <div class="masal-kart" onclick="masalAc(1)">
+                <h2 class="masal-baslik">İbikli Horoz</h2>
+                <span class="oku-link">Masalı Oku &rarr;</span>
+            </div>
+
+            <div class="masal-kart" onclick="masalAc(2)">
+                <h2 class="masal-baslik">Tembel Kız</h2>
+                <span class="oku-link">Masalı Oku &rarr;</span>
+            </div>
+
+            <div class="masal-kart" onclick="masalAc(3)">
+                <h2 class="masal-baslik">Keloğlan ile Yılan</h2>
+                <span class="oku-link">Masalı Oku &rarr;</span>
+            </div>
+
+            <div class="masal-kart" onclick="masalAc(4)">
+                <h2 class="masal-baslik">Kabak Gelin</h2>
+                <span class="oku-link">Masalı Oku &rarr;</span>
+            </div>
+
+            <div class="masal-kart" onclick="masalAc(5)">
+                <h2 class="masal-baslik">Üç Haylaz Masalı</h2>
+                <span class="oku-link">Masalı Oku &rarr;</span>
+            </div>
+
+            <div class="masal-kart" onclick="masalAc(6)">
+                <h2 class="masal-baslik">Kerem ile Aslı</h2>
+                <span class="oku-link">Masalı Oku &rarr;</span>
+            </div>
+
+            <div class="masal-kart" onclick="masalAc(7)">
+                <h2 class="masal-baslik">Kalyanam Kara Papam Kara</h2>
+                <span class="oku-link">Masalı Oku &rarr;</span>
+            </div>
+
+            <div class="masal-kart" onclick="masalAc(8)">
+                <h2 class="masal-baslik">Gökten Düşen Üç Elma</h2>
+                <span class="oku-link">Masalı Oku &rarr;</span>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Detay Penceresi (Modal Pop-up) -->
+    <div class="modal-bg" id="masalModal" onclick="disariTiklandi(event)">
+        <div class="modal-icerik">
+            <button class="kapat-btn" onclick="masalKapat()">&times;</button>
+            <h2 class="modal-baslik" id="modalBaslik">Masal Başlığı</h2>
+            <hr class="modal-cizgi">
+            <div class="modal-metin" id="modalMetin">Masal içeriği...</div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Programlamaya Giriş Vize Projesi — Görsel İletişim Tasarımı</p>
+    </footer>
+
+    <script>
+        // Masal İçerikleri Veri Tabanı
+        const masallar = {
+            1: {
+                baslik: "İbikli Horoz",
+                metin: "Evvel zaman içinde, kalbur saman içinde... Küçük bir köyde parlak ibikli, kırmızı tüylü güzel bir horoz yaşarmış. Bu horoz her sabah köylüleri neşeyle uyandırır, bahçede rızkını ararmış.\n\nBir gün kurnaz bir tilki köye gelmiş ve horozu tatlı sözlerle kandırmak istemiş. 'İbikli dostum, sesin ne güzel! Aşağı in de birlikte şarkı söyleyelim' demiş. Ancak İbikli Horoz kurnaz tilkinin niyetini hemen anlamış ve 'Köpekler de bize katılmak için geliyor!' diyerek tilkiyi korkutup kaçırmış. Zekası sayesinde tilkiye dersini vermiş."
+            },
+            2: {
+                baslik: "Tembel Kız",
+                metin: "Bir varmış bir yokmuş, eski zamanlarda bir köyde gün boyu oturan, elini hiçbir işe sürmeyen tembel bir kız yaşarmış. Annesi ne kadar dil dökse de kız çalışma isteği duymazmış.\n\nBir gün kuyu başında rastladığı nur yüzlü bir yaşlı kadın ona sihirli bir ayna vermiş. Kız aynaya baktığında emek vermeden hiçbir güzelliğin yeşermeyeceğini görmüş. O günden sonra tembelliği bırakıp çalışkan, çevresine faydalı bir insana dönüşmüş."
+            },
+            3: {
+                baslik: "Keloğlan ile Yılan",
+                metin: "Keloğlan keleş oğlan, kel kafası neşeli oğlan... Keloğlan bir gün ormanda odun toplarken kayaların arasına sıkışmış ve yardım isteyen altın renkli bir yılan görmüş. Merhametli Keloğlan hiç tereddüt etmeden yılanı kurtarmış.\n\nMeğer bu yılan Periler Ülkesi Padişahı'nın oğluymuş! Yılan, Keloğlan'ı sarayına götürmüş ve ona darda kaldığında dileğini gerçekleştiren sihirli bir yüzük hediye etmiş. Keloğlan bu sihirle iyilik yapmaya devam etmiş."
+            },
+            4: {
+                baslik: "Kabak Gelin",
+                metin: "Anadolu'nun şirin bir köyünde yalnız yaşayan yaşlı bir teyze varmış. Bahçesine ektiği kabaklardan biri zamanla büyümüş ve devasa, pırıl pırıl altın rengi bir kabağa dönüşmüş.\n\nGece yarısı olduğunda kabağın içinden iyilik meleği gibi güzel bir kız çıkıp evin tüm işlerini halleder, sabah olunca kabağa geri dönermiş. Teyze durumu fark edip kızın kalbini kazanmış ve onu kızı belleyerek mutlu mesut yaşamışlar."
+            },
+            5: {
+                baslik: "Üç Haylaz Masalı",
+                metin: "Bir köyde her gün bir haylazlık peşinde koşan üç kafadar yaşarmış. Ne köylünün öğütlerini dinler ne de iş güç yaparlarmış.\n\nBir gün köyün bilge ihtiyarı onlara içi kapalı bir kutu verip 'Bunu açmanın sırrı çalışmaktadır' demiş. Üç haylaz tarlada sürüp ter döktükten sonra kutunun içindeki gerçek hazinenin 'emek ve helal kazanç' olduğunu anlayarak doğru yolu bulmuşlar."
+            },
+            6: {
+                baslik: "Kerem ile Aslı",
+                metin: "Zamanın birinde İsfahan Şahı'nın oğlu Kerem, keşiş kızı Aslı'yı görüp sevdalanmış. Ancak aşıkların kavuşması kolay olmamış, diyarlar arası uzun bir yolculuk başlamış.\n\nKerem eline sazını alıp dağ taş demeden Aslı'nın peşinden türküler söyleyerek gezmiş. Bu büyük sevdadan geriye halk edebiyatımızın en samimi ve unutulmaz aşık geleneği hikayeleri kalmış."
+            },
+            7: {
+                baslik: "Kalyanam Kara Papam Kara",
+                metin: "Eski bozkır masallarında geçen bu destansı anlatıda, iki kardeş olan iyi kalpli Kalyanam ile kötü niyetli Kara Papam'ın maceraları aktarılır.\n\nKalyanam deniz aşırı ülkelere gidip halkı için şifalı inciler toplarken, kardeşi ona engel olmak istemiş. Ancak dürüstlük ve iyilik her zaman olduğu gibi galip gelmiş, Kalyanam ülkesine huzur ve adalet getirmiş."
+            },
+            8: {
+                baslik: "Gökten Düşen Üç Elma",
+                metin: "Evvel zamanı bitirdik, masalın sonuna geldik... Eskiler der ki masal bitince gökten üç elma düşermiş.\n\nBiri bu güzel anlatıyı kaleme alıp aktarana, biri gecesini sabırla dinlemeye ayıran siz değerli okuyuculara, diğeri ise dünyadaki tüm dürüst, iyi kalpli insanlara... Onlar ermiş muradına, biz çıkalım kerevetine."
+            }
+        };
+
+        // Masal Açma Fonksiyonu
+        function masalAc(id) {
+            const masal = masallar[id];
+            if (masal) {
+                document.getElementById('modalBaslik').innerText = masal.baslik;
+                document.getElementById('modalMetin').innerText = masal.metin;
+                document.getElementById('masalModal').classList.add('aktif');
+            }
+        }
+
+        // Masal Kapatma Fonksiyonu
+        function masalKapat() {
+            document.getElementById('masalModal').classList.remove('aktif');
+        }
+
+        // Dışarı Tıklandığında Kapatma
+        function disariTiklandi(event) {
+            if (event.target.id === 'masalModal') {
+                masalKapat();
+            }
+        }
+    </script>
+</body>
+</html>
